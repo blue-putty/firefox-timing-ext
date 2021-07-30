@@ -17,12 +17,19 @@ const addCloseAlarm = () => {
 
 browser.alarms.onAlarm.addListener(async (alarmInfo) => {
     if (alarmInfo.name === 'closeDate') {
+
         const tabsToClose = [];
         const tabs = await browser.tabs.query({})
         console.log(tabs);
         tabs.forEach(element => {
-            tabsToClose.push(element.id);
+            const id = element.id;
+            browser.tabs.executeScript(id, {code: preventClose.toString()});
+            tabsToClose.push(id);
         });
         browser.tabs.remove(tabsToClose);
     }
 })
+
+const preventClose = () => {
+    window.onbeforeunload = null;
+}
