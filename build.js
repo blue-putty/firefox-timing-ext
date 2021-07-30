@@ -1,17 +1,27 @@
 require('dotenv').config();
-const { exec } = require('child_process')
+const { spawn } = require('child_process');
 
-console.log(process.env.API_KEY);
+const command = 'web-ext';
+const args = [
+    'sign',
+    `--api-key="${process.env.API_KEY}"`,
+    `--api-secret="${process.env.API_SECRET}"`
+]
+const options = {
+    cwd: './src',
+    shell: true
+}
 
-const command = `cd src && web-ext sign --api-key="${process.env.API_KEY}" --api-secret="${process.env.API_SECRET}"`
-exec(command, (error, stdout, stderr) => {
-    if (error) {
-        console.log(`error: ${error.message}`);
-        return;
-    }
-    if (stderr) {
-        console.log(`stderr: ${stderr}`);
-        return;
-    }
-    console.log(`stdout: ${stdout}`);
+let ls = spawn(command, args, options);
+
+ls.stdout.on('data', function (data) {
+    console.log('stdout: ' + data.toString());
+});
+
+ls.stderr.on('data', function (data) {
+    console.log('stderr: ' + data.toString());
+});
+
+ls.on('exit', function (code) {
+    console.log('child process exited with code ' + code.toString());
 });
