@@ -1,2 +1,5 @@
 .env
 /node_modules
+
+.web-extension-id
+/build

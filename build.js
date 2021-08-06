@@ -1,27 +1,43 @@
 require('dotenv').config();
+const fs = require('fs')
 const { spawn } = require('child_process');
 
-const command = 'web-ext';
-const args = [
-    'sign',
-    `--api-key="${process.env.API_KEY}"`,
-    `--api-secret="${process.env.API_SECRET}"`
-]
-const options = {
-    cwd: './src',
-    shell: true
+incrementVersion();
+sign();
+
+function incrementVersion() {
+    const manifestPath = './src/manifest.json'
+    const buildPath = './build'
+    // fs.readFile(buildPath)
+    fs.readFile(manifestPath, function(err, dataBuffer) {
+        if (err) throw err;
+        const manifest = JSON.parse(dataBuffer.toString());
+        manifest.version 
+        console.log(manifest);
+    })
 }
 
-let ls = spawn(command, args, options);
+function sign() {
+    const command = 'web-ext';
+    const args = [
+        'sign',
+        `--api-key="${process.env.API_KEY}"`,
+        `--api-secret="${process.env.API_SECRET}"`,
+        `--artifacts-dir=./build`,
+        `--source-dir=./src`,
+    ]
 
-ls.stdout.on('data', function (data) {
-    console.log('stdout: ' + data.toString());
-});
+    let ls = spawn(command, args, {shell: true});
 
-ls.stderr.on('data', function (data) {
-    console.log('stderr: ' + data.toString());
-});
+    ls.stdout.on('data', function (data) {
+        console.log('stdout: ' + data.toString());
+    });
 
-ls.on('exit', function (code) {
-    console.log('child process exited with code ' + code.toString());
-});
+    ls.stderr.on('data', function (data) {
+        console.log('stderr: ' + data.toString());
+    });
+
+    ls.on('exit', function (code) {
+        console.log('child process exited with code ' + code.toString());
+    });
+}
